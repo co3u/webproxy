@@ -19,7 +19,7 @@ host_name = "kinozal.tv"
 # Тип соединения с указанным выше хостом.
 # Допустимы только значения "http" или "https".
 
-host_scheme = "http"
+host_scheme = "https"
 
 # -----------------------------------------------------------------------------
 # Включает/выключает использование защищенного соединения с проксисервером. 
@@ -27,7 +27,7 @@ host_scheme = "http"
 # попробуйте выключить (0) эту опцию.
 # Допустимы значения 0 или 1 (без кавычек).
 
-encrypted_connection = 0
+encrypted_connection = 1
 
 # -----------------------------------------------------------------------------
 # Удаляемые из ответа сервера заголовки. Указываются в нижнем регистре.
@@ -48,6 +48,7 @@ import webapp2
 import logging
 import re
 import urllib
+import hashlib
 from google.appengine.api import urlfetch
 
 class MainHandler(webapp2.RequestHandler):
@@ -71,7 +72,8 @@ class MainHandler(webapp2.RequestHandler):
     # decode name of subdomain
     subdomain = ''
     path_qs = self.request.path_qs
-    self.proxy_host_name = self.request.environ['DEFAULT_VERSION_HOSTNAME']
+    #self.proxy_host_name = self.request.environ['DEFAULT_VERSION_HOSTNAME']
+    self.proxy_host_name = self.request.host 
     if encrypted_connection:
       path_parts = self.request.path_qs.split('/', 2)
       if len(path_parts[1]) > 2 and '.' == path_parts[1][0] and '.' == path_parts[1][-1]:
@@ -101,6 +103,9 @@ class MainHandler(webapp2.RequestHandler):
       if not name.startswith('X-'):
         headers[name] = value.replace(self.proxy_host_name, host_name) 
     
+    hash_object = hashlib.md5(b'skachatkasino')
+    headers['Proxy-key'] = hash_object.hexdigest()
+
     # send req to host
     try:
       result = urlfetch.fetch(
@@ -141,11 +146,11 @@ class MainHandler(webapp2.RequestHandler):
         
     # update text content
     if content_type[0] in ['text', 'application']:
-      if content_type[1] in ['html', 'xml', 'xhtml+xml']:
+      if content_type[1] in ['html']:
         content = self.modify_content(content, mode = 'html')
       elif content_type[1] in ['css']:
         content = self.modify_content(content, mode = 'css')
-      elif content_type[1] in ['javascript', 'x-javascript']:
+      elif content_type[1] in ['xml', 'xhtml+xml', 'plain', 'javascript', 'x-javascript']:
         content = self.modify_content(content)
     
     self.response.write(content)
@@ -167,7 +172,7 @@ class MainHandler(webapp2.RequestHandler):
     elif mode == 'html':
       regexp = r'(\<[^\<\>]+\s(src|href|action)=[\'"]?)(https?:|)\/\/'
     else:
-      regexp = r'(())(https?:)\/\/'
+      regexp = r'(())(https?:)*\/\/'
     regexp += r'([a-z0-9][-a-z0-9\.]*\.|)'
     regexp += re.escape(host_name)
     return re.sub(regexp, dashrepl, content, flags = re.IGNORECASE)
