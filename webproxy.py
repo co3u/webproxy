@@ -147,7 +147,8 @@ class MainHandler(webapp2.RequestHandler):
     # update text content
     if content_type[0] in ['text', 'application']:
       if content_type[1] in ['html']:
-        content = self.modify_content(content, mode = 'html')
+        #content = self.modify_content(content, mode = 'html')
+        content = self.modify_content(content)
       elif content_type[1] in ['css']:
         content = self.modify_content(content, mode = 'css')
       elif content_type[1] in ['xml', 'xhtml+xml', 'plain', 'javascript', 'x-javascript']:
