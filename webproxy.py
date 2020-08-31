@@ -103,7 +103,7 @@ class MainHandler(webapp2.RequestHandler):
       if not name.startswith('X-'):
         headers[name] = value.replace(self.proxy_host_name, host_name) 
     
-    hash_object = hashlib.md5(b'skachatkasino')
+    hash_object = hashlib.md5(host_name.split('.')[0])
     headers['Proxy-key'] = hash_object.hexdigest()
 
     # send req to host
