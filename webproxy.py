@@ -151,7 +151,7 @@ class MainHandler(webapp2.RequestHandler):
         content = self.modify_content(content)
       elif content_type[1] in ['css']:
         content = self.modify_content(content, mode = 'css')
-      elif content_type[1] in ['xml', 'xhtml+xml', 'plain', 'javascript', 'x-javascript']:
+      elif content_type[1] in ['xml', 'rss+xml', 'xhtml+xml', 'plain', 'javascript', 'x-javascript']:
         content = self.modify_content(content)
     
     self.response.write(content)
