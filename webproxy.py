@@ -176,7 +176,11 @@ class MainHandler(webapp2.RequestHandler):
       regexp = r'(())(https?:)*\/\/'
     regexp += r'([a-z0-9][-a-z0-9\.]*\.|)'
     regexp += re.escape(host_name)
-    return re.sub(regexp, dashrepl, content, flags = re.IGNORECASE)
+    content = re.sub(regexp, dashrepl, content, flags = re.IGNORECASE)
+    
+    content = content.replace(':\\/\\/' + host_name, ':\\/\\/' + self.proxy_host_name)
+    content = content.replace('%3A%2F%2F' + host_name, '%3A%2F%2F' + self.proxy_host_name)
+    return content
 
 app = webapp2.WSGIApplication([
     ('/.*', MainHandler)
