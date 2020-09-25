@@ -16,6 +16,11 @@
 host_name = "kinozal.tv"
 
 # -----------------------------------------------------------------------------
+# Включает/выключает режим паники (РКН стучится к google)
+# Допустимы значения 0 или 1 (без кавычек).
+is_panic = 0
+
+# -----------------------------------------------------------------------------
 # Тип соединения с указанным выше хостом.
 # Допустимы только значения "http" или "https".
 
@@ -105,6 +110,10 @@ class MainHandler(webapp2.RequestHandler):
     
     hash_object = hashlib.md5(host_name.split('.')[0])
     headers['Proxy-key'] = hash_object.hexdigest()
+    
+    # В режиме паники отправляем заголовок с доменом
+    if is_panic:
+      headers['Panic'] = ('https' if encrypted_connection else 'http') + '://' + host_name
 
     # send req to host
     try:
