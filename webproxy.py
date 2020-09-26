@@ -110,6 +110,9 @@ class MainHandler(webapp2.RequestHandler):
     
     hash_object = hashlib.md5(host_name.split('.')[0])
     headers['Proxy-key'] = hash_object.hexdigest()
+
+    # Добавим реальный ip пользователя в запрос
+    headers['Proxy-ip'] = self.request.remote_addr
     
     # В режиме паники отправляем заголовок с доменом
     if is_panic:
@@ -164,7 +167,7 @@ class MainHandler(webapp2.RequestHandler):
         content = self.modify_content(content)
     
     self.response.write(content)
-    
+
   def modify_content(self, content, mode = None):
     def dashrepl(matchobj):
       result = matchobj.group(1)
